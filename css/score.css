@@ -1,0 +1,303 @@
+@charset "utf-8";
+
+* {
+  margin    : 0;
+  padding   : 0;
+  font-size : 100%;
+}
+
+body {
+  font-family : "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, sans-serif;
+  background  : #cef;
+  display     : inline-block;
+  min-width   : 100%;
+}
+
+button, label, input[type=checkbox], input[type=button] {
+    cursor: pointer;
+}
+
+a {
+    text-decoration : none;
+}
+
+table {
+  border-spacing : 0;
+}
+
+table#score_board {
+  margin         : 0.6em;
+  border-spacing : 4px 0;
+  background     : #adf;
+  border         : solid 3px #fff;
+  padding        : 0.6em 0.4em;
+}
+
+#header {
+  color         : #fff;
+  background    : #78e5ff;
+  background    : linear-gradient(#37d1ff, #78e5ff);
+  padding       : 0.5em 0.5em 0;
+  border-bottom : solid 5px #666;
+}
+
+#header h1 {
+  font-size     : 20px;
+  margin-bottom : 0.2em;
+  border-bottom : solid 2px; #fff;
+  display       : inline-block;
+}
+
+#header ul {
+  list-style-type : none;
+  margin          : 0.4em;
+}
+
+#header ul li.inline {
+  width      : 105px;
+  display    : inline-block;
+  text-align : center;
+}
+
+#header ul li.inline li.value {
+  font-size     : 18px;
+  font-weight   : bold;
+  border-bottom : solid 1px #fff;
+  line-height   : 1em;
+}
+
+#header ul li.inline li.item {
+  font-size : 11px;
+}
+
+#main #score_board .row {
+  border       : solid #fff;
+  border-width : 1px 0 0 1px;
+}
+
+#main #score_board .row .measure {
+  background : #256;
+}
+
+#main #score_board .row .measure th {
+  border       : solid #fff;
+  border-width : 0 1px 1px 0;
+  background   : #999;
+  width        : 20px;
+  position     : relative;
+  font-size    : 12px;
+  font-family  : monospace;
+}
+
+#main #score_board .row .measure td {
+  width        : 47px;
+  position     : relative;
+  border       : solid #fff;
+  border-width : 0 1px 1px 0;
+}
+
+#main #score_board .row .measure td.lane{
+  height : 127px;
+}
+
+#main #score_board .row .measure td .line0 {
+  width      : 100%;
+  height     : 1px;
+  background : #fff;
+  position   : absolute;
+}
+
+#main #score_board .row .measure td .line1 {
+  width      : 1px;
+  height     : 128px;
+  background : #888;
+  top        : 0px;
+  position   : absolute;
+}
+
+#main #score_board .row .measure td .line2 {
+  width      : 100%;
+  height     : 1px;
+  background : #888;
+  position   : absolute;
+}
+
+#main #score_board .row .measure td .line3 {
+  width      : 100%;
+  height     : 1px;
+  background : #444;
+  position   : absolute;
+}
+
+#main #score_board .row .measure td .marker1 {
+  width         : 13px;
+  border        : 1px solid #ccc;
+  height        : 13px;
+  background    : #fff;
+  bottom        : 0px;
+  position      : absolute;
+  border-radius : 8px;
+}
+
+#main #score_board .row .measure td .marker2 {
+  width         : 13px;
+  border        : 1px solid #ddd;
+  height        : 13px;
+  background    : #ff9;
+  bottom        : 0px;
+  position      : absolute;
+  font-size     : 8px;
+  text-align    : center;
+  line-height   : 13px;
+  border-radius : 8px;
+}
+
+#main #score_board .row .measure td .marker3 {
+  width       : 13px;
+  border      : 1px solid #ddd;
+  height      : 13px;
+  background  : #ff9;
+  bottom      : 0px;
+  position    : absolute;
+  font-size   : 8px;
+  text-align  : center;
+  line-height : 6px;
+}
+
+#main #score_board .row .measure td .fiver_board {
+  position   : absolute;
+  background : #8df;
+  width      : 47px;
+}
+
+#main #score_board .row .measure td .boss_attack_board {
+  position   : absolute;
+  background : #d9f;
+  width      : 47px;
+}
+
+#footer {
+    margin : 1em 0;
+}
+
+#footer ul::after {
+    content : "";
+    display:block;
+    clear:both;
+}
+
+#footer #option {
+  width      : 500px;
+  border     : solid 1px #000;
+  margin     : 0 1em;
+  background : #abdfff;
+}
+
+#footer #option td {
+  padding : 2px;
+}
+
+#footer .stage-boss,
+#footer .stage-boss-th,
+#header ul li.stage-boss {
+    display : none;
+}
+
+#player-link {
+    font-family:"ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "メイリオ";
+    display:inline-block;
+    background : #fff;
+    background:#fff linear-gradient(#fff, #ddd);
+    padding : 5px 10px;
+    border:1px solid #333;
+    color:#333;
+}
+#player-link:hover {
+    background:#fff linear-gradient(#ddd, #fff);
+}
+/*
+input[type=button] {
+    font-family:"ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "メイリオ";
+    border:1px solid #333;
+    background:#fff linear-gradient(#fff, #ddd);
+    padding:5px 10px;
+    color:#333;
+}
+input[type=button]:hover {
+    background:#ddd linear-gradient(#ddd, #fff);
+}
+*/
+
+input[type=radio] + label,
+input[type=checkbox] + label {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+
+input[type=radio],
+input[type=checkbox] {
+    display: none;
+}
+
+input[type=radio] + label,
+input[type=checkbox] + label {
+    padding-left:24px;
+}
+
+input[type=radio] + label:before,
+input[type=checkbox] + label:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    box-sizing: border-box;
+    display: block;
+    width: 18px;
+    height: 18px;
+    margin-top: -9px;
+    background: #fff;
+}
+
+input[type=radio] + label:before {
+    border: 2px solid #aaa;
+    border-radius: 30px;
+}
+
+input[type=checkbox] + label:before {
+    border: 2px solid #aaa;
+}
+
+input[type=radio]:checked + label:after,
+input[type=checkbox]:checked + label:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    box-sizing: border-box;
+    display: block;
+}
+
+input[type=radio]:checked + label:after {
+    margin-top: -4px;
+    left: 5px;
+    width: 8px;
+    height: 8px;
+    background: #555;
+    border-radius: 8px;
+}
+
+input[type=checkbox]:checked + label:after {
+    margin-top: -6px;
+    left: 3px;
+    width: 14px;
+    height: 8px;
+    border-left: 3px solid #555;
+    border-bottom: 3px solid #555;
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+
+input.count-button {
+    width : 20px;
+    padding : 0;
+}
