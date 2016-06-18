@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="height=device-height">
+  <meta name="format-detection" content="telephone=no">
+  <title>SB69 Score Viewer</title>
+  <link href="img/icon.png" rel="icon">
+  <link href="css/viewer.css" rel="stylesheet" />
+  <script src="js/SBRScript.js"></script>
+  <script src="js/SBRSViewer.js"></script>
+</head>
+
+<body>
+  <div id="title">
+    <h1 class="value">No Title ★0</h1>
+  </div>
+  <div id="info">
+    <ul>
+      <li id="info-bpm" class="type-both">
+        <div class="value">-</div>
+        <div class="key">BPM</div>
+        <div class="description">
+          <p>曲のBPMです。</p>
+        </div>
+      </li>
+      <li id="info-combo" class="type-both">
+        <div class="value">-</div>
+        <div class="key">COMBO</div>
+        <div class="description">
+          <p>この譜面のMAX COMBOの最大値です。</p>
+        </div>
+      </li>
+      <li id="info-marker" class="type-both">
+        <div class="value">-</div>
+        <div class="key">MARKER</div>
+        <div class="description">
+          <p>この譜面のマーカーの数です。 ロングマーカーは長さに関係なく、マーカー1つとしてカウントしています。</p>
+        </div>
+      </li>
+      <li id="info-fevercombo" class="type-score">
+        <div class="value">-</div>
+        <div class="key">FEVER-COMBO</div>
+        <div class="description">
+          <p>常に最適なタイミングでマーカーをタップした場合に、 フィーバー中に増加するコンボ数の目安です。</p>
+        </div>
+      </li>
+      <li id="info-fevergauge" class="type-score">
+        <div class="value">-</div>
+        <div class="key">FEVER-GAUGE</div>
+        <div class="description">
+          <p>フィーバーゲージの長さです。 PERFECT～MISSの判定により、それぞれ4,2,1,-1と増加し、 この値を超えるとフィーバーになります。</p>
+          <p>「フィーバーゲージがたまりやすくなる」のスキルを使用している場合、増加量が7倍になります。</p>
+        </div>
+      </li>
+      <li id="info-bossattack" class="type-boss">
+        <div class="value">-</div>
+        <div class="key">BOSS-ATTACK</div>
+        <div class="description">
+          <p>ボスの攻撃回数です。</p>
+        </div>
+      </li>
+      <li id="info-playercombo" class="type-boss">
+        <div class="value">-</div>
+        <div class="key">PLAYER-COMBO</div>
+        <div class="description">
+          <p>ボスが攻撃していない時のコンボ数の目安です。</p>
+        </div>
+      </li>
+      <li id="info-bosscombo" class="type-boss">
+        <div class="value">-</div>
+        <div class="key">BOSS-COMBO</div>
+        <div class="description">
+          <p>ボスが攻撃している時のコンボ数の目安です。</p>
+        </div>
+      </li>
+      <li id="info-time" class="type-both">
+        <div class="value">-</div>
+        <div class="key">TIME</div>
+        <div class="description">
+          <p>演奏時間の目安です。</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="view"></div>
+  <div>
+    <fieldset id="option">
+      <legend>
+        オプション
+        <span>[</span>
+        <input type="radio" id="option-skill" name="option" checked />
+        <label for="option-skill">スキル設定</label>
+        <span>|</span>
+        <input type="radio" id="option-display" name="option" />
+        <label for="option-display">表示設定</label>
+        <span>]</span>
+      </legend>
+      <div class="option-skill">
+        <input type="radio" id="stage-type-score" name="stage-type" checked />
+        <label for="stage-type-score">スコアアタック</label>
+        <input type="radio" id="stage-type-boss" name="stage-type" />
+        <label for="stage-type-boss">BOSSバトル</label>
+        <div class="type-score">
+          <input type="checkbox" id="option-skill-fever" />
+          <label for="option-skill-fever">フィーバーゲージがたまりやすくなる</label>
+        </div>
+        <div class="type-boss">
+          <input type="checkbox" id="option-skill-bossattackfrequently" />
+          <label for="option-skill-bossattackfrequently">ボスの攻撃頻度を下げる</label>
+          <input type="checkbox" id="option-skill-bossattackshort" />
+          <label for="option-skill-bossattackshort">ボスの攻撃時間が短くなる</label>
+        </div>
+      </div>
+      <div class="option-display">
+        <div class="option-display-left">
+          <div>
+            <label>
+              レーンの幅
+              <select id="display-lane-width">
+                <option value="7">7</option>
+                <option value="9">9</option>
+                <option value="11">11</option>
+                <option value="13">13</option>
+                <option value="15">15</option>
+                <option value="17">17</option>
+                <option value="19">19</option>
+                <option value="21">21</option>
+                <option value="23">23</option>
+                <option value="25">25</option>
+                <option value="27">27</option>
+                <option value="29">29</option>
+                <option value="31">31</option>
+                <option value="33">33</option>
+                <option value="35">35</option>
+              </select>
+            </label>
+            <label>
+              拍の高さ
+              <select id="display-beat-height">
+                <option value="8">8</option>
+                <option value="12">12</option>
+                <option value="16">16</option>
+                <option value="20">20</option>
+                <option value="24">24</option>
+                <option value="28">28</option>
+                <option value="32">32</option>
+                <option value="36">36</option>
+                <option value="40">40</option>
+                <option value="44">44</option>
+                <option value="48">48</option>
+                <option value="52">52</option>
+                <option value="56">56</option>
+                <option value="60">60</option>
+              </select>
+            </label>
+            <label>
+              1列の拍数
+              <select id="display-col-beat">
+                <option value="4">4</option>
+                <option value="8">8</option>
+                <option value="12">12</option>
+                <option value="16">16</option>
+                <option value="20">20</option>
+                <option value="24">24</option>
+                <option value="28">28</option>
+                <option value="32">32</option>
+                <option value="40">40</option>
+                <option value="48">48</option>
+                <option value="64">64</option>
+                <option value="96">96</option>
+                <option value="128">128</option>
+                <option value="196">196</option>
+                <option value="256">256</option>
+              </select>
+            </label>
+          </div>
+          <div>
+            <label>
+              マーカーの大きさ
+              <select id="display-marker-size">
+                <option value="7">7</option>
+                <option value="9">9</option>
+                <option value="11">11</option>
+                <option value="13">13</option>
+                <option value="15">15</option>
+                <option value="17">17</option>
+                <option value="19">19</option>
+                <option value="21">21</option>
+                <option value="23">23</option>
+                <option value="25">25</option>
+                <option value="27">27</option>
+                <option value="29">29</option>
+                <option value="31">31</option>
+                <option value="33">33</option>
+                <option value="35">35</option>
+              </select>
+              </label>
+            <label>
+              フォントサイズ
+              <select id="display-font-size">
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="option-display-right">
+          <ul>
+            <li><span id="option-save" class="button">保存</span></li>
+            <li><span id="option-reset" class="button">リセット</span></li>
+          </ul>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</body>
+
+</html>
