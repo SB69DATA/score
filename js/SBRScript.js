@@ -1,7 +1,3 @@
-/*
- * 履歴
- * 2016/04/01 ver 1.00 新規作成
- */
 var SBRScript = (function() {
 
   var SBRScript = {};

@@ -1,6 +1,3 @@
-/*
- * 履歴
- */
 var SBRSViewer = (function() {
 
   var SBRSViewer = {};
