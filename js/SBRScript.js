@@ -1,3 +1,4 @@
+// ver 1.0.0
 var SBRScript = (function() {
 
   var SBRScript = {};
@@ -327,7 +328,7 @@ var SBRScript = (function() {
         }
       } else {
         // 読み込み失敗
-        console.error("譜面の読み込みに失敗しました(url:%s)", sbrScriptUrl);
+        console.error("譜面の読み込みに失敗しました(url:%s)", decodeURI(sbrScriptUrl));
         if (callback && typeof callback.error === "function") {
           callback.error();
         }
@@ -357,7 +358,7 @@ var SBRScript = (function() {
               }
             } else {
               // 読み込み失敗
-              console.error("譜面の読み込みに失敗しました(url:%s)", sbrScriptUrl);
+              console.error("譜面の読み込みに失敗しました(url:%s)", decodeURI(sbrScriptUrl));
               if (callback && typeof callback.error === "function") {
                 callback.error();
               }
@@ -406,11 +407,11 @@ var SBRScript = (function() {
     }
 
     if (bpmIndex === -1) {
-      // 該当小節にBPM変更あり
+      // 該当小節にBPM変更なし
 
       time = measureObj.time + (240000.0 / bpm * (measureObj.valueS / measureObj.valueB) * (point / measureObj.valueS));
     } else {
-      // 該当小節にBPM変更なし
+      // 該当小節にBPM変更あり
 
       bpmObj = sbrs.bpm[bpmIndex];
       if (bpmObj.point === point) {
@@ -475,7 +476,7 @@ var SBRScript = (function() {
     }
 
     if (bpmIndex !== -1) {
-      // 該当小節にBPM変更あり
+      // 該当小節にBPM変更なし
 
       bpmObj = sbrs.bpm[bpmIndex];
 
@@ -483,7 +484,7 @@ var SBRScript = (function() {
       pointValue = bpmObj.point + measureS * ((time - bpmObj.time) / (240000.0 / bpmObj.value * (measureS / measureB)));
 
     } else {
-      // 該当小節にBPM変更なし
+      // 該当小節にBPM変更あり
 
       // 1小節の時間
       measureTime = 240000.0 / bpm * (measureS / measureB);
@@ -699,7 +700,7 @@ var SBRScript = (function() {
         } else {
           // ロングマーカーの終端が見つからなかった場合、通常のマーカーとして扱う
           marker.type = 1;
-          console.warn("ロングマーカーの終端情報が見つかりませんでした(" + marker.measure + "小節, " + marker.point + "拍目)");
+          console.warn("ロングマーカーの終端情報が見つかりませんでした(%s小節, %s拍目)", marker.measure, marker.point);
         }
       }
     }
