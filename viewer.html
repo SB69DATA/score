@@ -116,7 +116,7 @@
       <div class="option-display">
         <div class="option-display-left">
           <div>
-            <label>
+            <label class="line">
               レーンの幅
               <select id="display-lane-width">
                 <option value="7">7</option>
@@ -136,7 +136,7 @@
                 <option value="35">35</option>
               </select>
             </label>
-            <label>
+            <label class="line">
               拍の高さ
               <select id="display-beat-height">
                 <option value="8">8</option>
@@ -155,7 +155,7 @@
                 <option value="60">60</option>
               </select>
             </label>
-            <label>
+            <label class="line">
               1列の拍数
               <select id="display-col-beat">
                 <option value="4">4</option>
@@ -177,7 +177,7 @@
             </label>
           </div>
           <div>
-            <label>
+            <label class="line">
               マーカーの大きさ
               <select id="display-marker-size">
                 <option value="7">7</option>
@@ -197,7 +197,7 @@
                 <option value="35">35</option>
               </select>
               </label>
-            <label>
+            <label class="line">
               フォントサイズ
               <select id="display-font-size">
                 <option value="6">6</option>
@@ -217,6 +217,10 @@
                 <option value="20">20</option>
               </select>
             </label>
+          </div>
+          <div>
+            <input type="checkbox" id="long-marker-fast-tap" />
+            <label for="long-marker-fast-tap">早押し・遅く離すのが必要なロングマーカーを強調</label>
           </div>
         </div>
         <div class="option-display-right">

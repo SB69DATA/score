@@ -1,3 +1,4 @@
+// ver 1.1.0
 var SBRSViewer = (function() {
 
   var SBRSViewer = {};
@@ -10,11 +11,12 @@ var SBRSViewer = (function() {
   var DEFAULT_START_OFFSET = -2200; // 演奏開始から1小節目が流れてくるまでの時間
   var FEVER_HIGH_MAGNIFICATION = 7; // フィーバーゲージがたまりやすくなるのスキル使用時のゲージ増加倍率
 
-  var BEAT_HEIGHT_DEFAULT = 20; // 拍の高さのデフォルト
-  var LANE_WIDTH_DEFAULT = 13; // レーンの幅のデフォルト
-  var MARKER_SIZE_DEFAULT = 13; // マーカーの大きさのデフォルト
-  var COL_BEAT_DEFAULT = 32; // 列の拍数のデフォルト
-  var FONT_SIZE_DEFAULT = 10; // フォントの大きさのデフォルト
+  var DEFAULT_BEAT_HEIGHT = 20; // 拍の高さのデフォルト
+  var DEFAULT_LANE_WIDTH = 13; // レーンの幅のデフォルト
+  var DEFAULT_MARKER_SIZE = 13; // マーカーの大きさのデフォルト
+  var DEFAULT_COL_BEAT = 32; // 列の拍数のデフォルト
+  var DEFAULT_FONT_SIZE = 10; // フォントの大きさのデフォルト
+  var DEFAULT_LONG_MARKER_FAST_TAP = false; // ロングマーカーの強調表示設定のデフォルト
 
   var VIEWER_STORAGE_KEY = "VIEWER_OPTION_DATA"; // オプション保存用ローカルストレージのキー
 
@@ -31,12 +33,13 @@ var SBRSViewer = (function() {
   SBRSViewer.info.bosscombo = "-"; // ボス攻撃中のコンボ数
   SBRSViewer.info.time = "-"; // 演奏時間
   SBRSViewer.option = {}; // 表示設定関連のオブジェクト
-  SBRSViewer.option.beatHeight = BEAT_HEIGHT_DEFAULT; // 拍の高さ
-  SBRSViewer.option.laneWidth = LANE_WIDTH_DEFAULT; // レーンの幅
-  SBRSViewer.option.colBeat = COL_BEAT_DEFAULT; // 列の拍数
-  SBRSViewer.option.markerSize = MARKER_SIZE_DEFAULT; // マーカーの大きさ
-  SBRSViewer.option.fontSize = FONT_SIZE_DEFAULT; // フォントの大きさ
+  SBRSViewer.option.beatHeight = DEFAULT_BEAT_HEIGHT; // 拍の高さ
+  SBRSViewer.option.laneWidth = DEFAULT_LANE_WIDTH; // レーンの幅
+  SBRSViewer.option.colBeat = DEFAULT_COL_BEAT; // 列の拍数
+  SBRSViewer.option.markerSize = DEFAULT_MARKER_SIZE; // マーカーの大きさ
+  SBRSViewer.option.fontSize = DEFAULT_FONT_SIZE; // フォントの大きさ
   SBRSViewer.option.startOffset = DEFAULT_START_OFFSET; // 演奏開始から1小節目が流れてくるまでの時間
+  SBRSViewer.option.longMarkerFastTap = DEFAULT_LONG_MARKER_FAST_TAP; // ロングマーカーの強調表示設定
   SBRSViewer.option.stageType = "score"; // 選択中のステージタイプ
   SBRSViewer.option.feverGaugeHigh = false; // フィーバーゲージがたまりやすくなるのスキルの使用有無
   SBRSViewer.option.bossAttackFrequently = false; // ボスの攻撃頻度を下げるのスキルの使用有無
@@ -49,6 +52,7 @@ var SBRSViewer = (function() {
     this.colBeat = option.colBeat;
     this.markerSize = option.markerSize;
     this.fontSize = option.fontSize;
+    this.longMarkerFastTap = option.longMarkerFastTap;
   }
 
   // 対応チェック
@@ -167,31 +171,31 @@ var SBRSViewer = (function() {
     var elements;
     var i, iLen;
 
-    // ステージタイプの変更イベントを登録
+    // ステージタイプの変更
     elements = document.getElementsByName("stage-type");
     for (i = 0, iLen = elements.length; i < iLen; i++) {
       elements[i].addEventListener("change", changeStageType);
     }
 
-    // オプションの変更イベントを登録
+    // オプションの変更
     elements = document.getElementsByName("option");
     for (i = 0, iLen = elements.length; i < iLen; i++) {
       elements[i].addEventListener("change", changeOption);
     }
 
-    // フィーバーゲージがたまりやすくなるのスキル切り替えイベントを登録
+    // フィーバーゲージがたまりやすくなるのスキル切り替え
     document.getElementById("option-skill-fever").addEventListener("change", function(e) {
       SBRSViewer.option.feverGaugeHigh = e.target.checked;
       draw();
     });
 
-    // ボスの攻撃頻度を下げるのスキル切り替えイベントを登録
+    // ボスの攻撃頻度を下げるのスキル切り替え
     document.getElementById("option-skill-bossattackfrequently").addEventListener("change", function(e) {
       SBRSViewer.option.bossAttackFrequently = e.target.checked;
       draw();
     });
 
-    // ボスの攻撃時間が短くなるのスキル切り替えイベントを登録
+    // ボスの攻撃時間が短くなるのスキル切り替え
     document.getElementById("option-skill-bossattackshort").addEventListener("change", function(e) {
       SBRSViewer.option.bossAttackShort = e.target.checked;
       draw();
@@ -227,6 +231,12 @@ var SBRSViewer = (function() {
       draw();
     });
 
+    // ロングマーカーの強調表示変更
+    document.getElementById("long-marker-fast-tap").addEventListener("change", function(e) {
+      SBRSViewer.option.longMarkerFastTap = e.target.checked;
+      draw();
+    });
+
     // オプションの保存
     document.getElementById("option-save").addEventListener("click", function(e) {
       var storage = new ScoreViewerOptionStorage(SBRSViewer.option);
@@ -242,7 +252,6 @@ var SBRSViewer = (function() {
 
     // オプションのリセット
     document.getElementById("option-reset").addEventListener("click", function(e) {
-      var storage = new ScoreViewerOptionStorage(SBRSViewer.option);
       if (confirm("表示設定の内容をリセットします。よろしいですか？")) {
         try {
           localStorage.removeItem(VIEWER_STORAGE_KEY);
@@ -267,25 +276,27 @@ var SBRSViewer = (function() {
 
     if ((item = localStorage.getItem(VIEWER_STORAGE_KEY))) {
       option = JSON.parse(item);
-      SBRSViewer.option.beatHeight = option.beatHeight;
-      SBRSViewer.option.laneWidth = option.laneWidth;
-      SBRSViewer.option.colBeat = option.colBeat;
-      SBRSViewer.option.markerSize = option.markerSize;
-      SBRSViewer.option.fontSize = option.fontSize;
+      SBRSViewer.option.beatHeight = option.beatHeight || DEFAULT_BEAT_HEIGHT;
+      SBRSViewer.option.laneWidth = option.laneWidth || DEFAULT_LANE_WIDTH;
+      SBRSViewer.option.colBeat = option.colBeat || DEFAULT_COL_BEAT;
+      SBRSViewer.option.markerSize = option.markerSize || DEFAULT_MARKER_SIZE;
+      SBRSViewer.option.fontSize = option.fontSize || DEFAULT_FONT_SIZE;
+      SBRSViewer.option.longMarkerFastTap = option.longMarkerFastTap || DEFAULT_LONG_MARKER_FAST_TAP;
     } else {
-      option = SBRSViewer.option;
-      SBRSViewer.option.beatHeight = BEAT_HEIGHT_DEFAULT;
-      SBRSViewer.option.laneWidth = LANE_WIDTH_DEFAULT;
-      SBRSViewer.option.colBeat = COL_BEAT_DEFAULT;
-      SBRSViewer.option.markerSize = MARKER_SIZE_DEFAULT;
-      SBRSViewer.option.fontSize = FONT_SIZE_DEFAULT;
+      SBRSViewer.option.beatHeight = DEFAULT_BEAT_HEIGHT;
+      SBRSViewer.option.laneWidth = DEFAULT_LANE_WIDTH;
+      SBRSViewer.option.colBeat = DEFAULT_COL_BEAT;
+      SBRSViewer.option.markerSize = DEFAULT_MARKER_SIZE;
+      SBRSViewer.option.fontSize = DEFAULT_FONT_SIZE;
+      SBRSViewer.option.longMarkerFastTap = DEFAULT_LONG_MARKER_FAST_TAP;
     }
 
-    document.getElementById("display-lane-width").value = option.laneWidth;
-    document.getElementById("display-beat-height").value = option.beatHeight;
-    document.getElementById("display-col-beat").value = option.colBeat;
-    document.getElementById("display-marker-size").value = option.markerSize;
-    document.getElementById("display-font-size").value = option.fontSize;
+    document.getElementById("display-lane-width").value = SBRSViewer.option.laneWidth;
+    document.getElementById("display-beat-height").value = SBRSViewer.option.beatHeight;
+    document.getElementById("display-col-beat").value = SBRSViewer.option.colBeat;
+    document.getElementById("display-marker-size").value = SBRSViewer.option.markerSize;
+    document.getElementById("display-font-size").value = SBRSViewer.option.fontSize;
+    document.getElementById("long-marker-fast-tap").checked = SBRSViewer.option.longMarkerFastTap;
   }
 
   /* function resetForm
@@ -304,6 +315,10 @@ var SBRSViewer = (function() {
 
     // オプションの設定選択をリセット
     document.getElementById("option-skill").checked = true;
+
+    // ロングマーカーの強調表示をリセット
+    document.getElementById("long-marker-fast-tap").checked = false;
+
   }
 
   /* function addLoadStyle
@@ -825,7 +840,11 @@ var SBRSViewer = (function() {
             break;
           case 2:
             // ロング開始
-            markerDiv.className = "long-marker";
+            if (SBRSViewer.option.longMarkerFastTap && (marker.point + 0.125) % 1 <= 0.125) {
+              markerDiv.className = "long-marker emphasis";
+            } else {
+              markerDiv.className = "long-marker";
+            }
             markerDiv.style.zIndex = 300 + len - markerIndex;
 
             markerValueDiv = document.createElement("div");
@@ -856,7 +875,11 @@ var SBRSViewer = (function() {
             break;
           case 3:
             // ロング終了
-            markerDiv.className = "long-marker";
+            if (SBRSViewer.option.longMarkerFastTap && marker.point % 1 > 0 && marker.point % 1 <= 0.125) {
+              markerDiv.className = "long-marker emphasis";
+            } else {
+              markerDiv.className = "long-marker";
+            }
             markerDiv.style.zIndex = 100 + len - markerIndex;
             break;
           default:
@@ -1004,7 +1027,7 @@ var SBRSViewer = (function() {
     // 演奏時間取得
     SBRSViewer.info.time = Math.round(sbrs.endTime / 1000);
 
-    document.title = SBRSViewer.title + " | Sb69 Score Viewer";
+    document.title = SBRSViewer.title + " | SB69 Score Viewer";
     document.querySelector("#title .value").innerHTML = SBRSViewer.title;
     document.querySelector("#info-bpm .value").innerHTML = SBRSViewer.info.bpm;
     document.querySelector("#info-combo .value").innerHTML = SBRSViewer.info.combo;
