@@ -206,6 +206,10 @@ ul {
   z-index: 10;
 }
 
+#view table.col tr td .skill-scoreboost {
+  background : #ace3ff;
+}
+
 #view .fever-background {
   width: 100%;
   background: #d0ebff;

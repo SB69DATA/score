@@ -1,4 +1,4 @@
-// ver 1.1.1
+// ver 1.2.0
 var SBRSViewer = (function() {
 
   var SBRSViewer = {};
@@ -10,6 +10,7 @@ var SBRSViewer = (function() {
   var FEVER_TIME = 10000; // フィーバータイムの時間
   var DEFAULT_START_OFFSET = -2200; // 演奏開始から1小節目が流れてくるまでの時間
   var FEVER_HIGH_MAGNIFICATION = 7; // フィーバーゲージがたまりやすくなるのスキル使用時のゲージ増加倍率
+  var SCORE_BOOST_COMBO_INTERVAL = 40; // スコアブースト発動に必要なコンボ数
 
   var DEFAULT_BEAT_HEIGHT = 20; // 拍の高さのデフォルト
   var DEFAULT_LANE_WIDTH = 13; // レーンの幅のデフォルト
@@ -17,33 +18,69 @@ var SBRSViewer = (function() {
   var DEFAULT_COL_BEAT = 32; // 列の拍数のデフォルト
   var DEFAULT_FONT_SIZE = 10; // フォントの大きさのデフォルト
   var DEFAULT_LONG_MARKER_FAST_TAP = false; // ロングマーカーの強調表示設定のデフォルト
+  var DEFAULT_SCORE_BOOST_MARKER = false; // スコアブーストマーカーの表示設定のデフォルト
+  var DEFAULT_SCORE_BOOST_COUNT = 6; // スコアブーストのスキル所持ブロマイド数のデフォルト
 
   var VIEWER_STORAGE_KEY = "VIEWER_OPTION_DATA"; // オプション保存用ローカルストレージのキー
 
   SBRSViewer.sbrs = null; // sbrスクリプトオブジェクト
   SBRSViewer.title = "No Title ★0"; // タイトル
-  SBRSViewer.info = {}; // 表示情報関連オブジェクト
-  SBRSViewer.info.bpm = "-"; // BPM
-  SBRSViewer.info.combo = "-"; // COMBO数理論値
-  SBRSViewer.info.marker = "-"; // マーカー数
-  SBRSViewer.info.fevercombo = "-"; // フィーバー中のコンボ数
-  SBRSViewer.info.fevergauge = "-"; // フィーバーゲージの長さ
-  SBRSViewer.info.bossattack = "-"; // ボスの攻撃回数
-  SBRSViewer.info.playercombo = "-"; // プレイヤー攻撃中のコンボ数
-  SBRSViewer.info.bosscombo = "-"; // ボス攻撃中のコンボ数
-  SBRSViewer.info.time = "-"; // 演奏時間
-  SBRSViewer.option = {}; // 表示設定関連のオブジェクト
-  SBRSViewer.option.beatHeight = DEFAULT_BEAT_HEIGHT; // 拍の高さ
-  SBRSViewer.option.laneWidth = DEFAULT_LANE_WIDTH; // レーンの幅
-  SBRSViewer.option.colBeat = DEFAULT_COL_BEAT; // 列の拍数
-  SBRSViewer.option.markerSize = DEFAULT_MARKER_SIZE; // マーカーの大きさ
-  SBRSViewer.option.fontSize = DEFAULT_FONT_SIZE; // フォントの大きさ
-  SBRSViewer.option.startOffset = DEFAULT_START_OFFSET; // 演奏開始から1小節目が流れてくるまでの時間
-  SBRSViewer.option.longMarkerFastTap = DEFAULT_LONG_MARKER_FAST_TAP; // ロングマーカーの強調表示設定
-  SBRSViewer.option.stageType = "score"; // 選択中のステージタイプ
-  SBRSViewer.option.feverGaugeHigh = false; // フィーバーゲージがたまりやすくなるのスキルの使用有無
-  SBRSViewer.option.bossAttackFrequently = false; // ボスの攻撃頻度を下げるのスキルの使用有無
-  SBRSViewer.option.bossAttackShort = false; // ボスの攻撃時間が短くなるのスキルの使用有無
+
+  var info = new Info();
+  SBRSViewer.info = info;
+
+  var option = new Option();
+  SBRSViewer.option = option;
+
+  // 表示情報関連オブジェクト
+  function Info() {
+    this.bpm = "-"; // BPM
+    this.combo = "-"; // COMBO数理論値
+    this.marker = "-"; // マーカー数
+    this.fevercombo = "-"; // フィーバー中のコンボ数
+    this.fevergauge = "-"; // フィーバーゲージの長さ
+    this.bossattack = "-"; // ボスの攻撃回数
+    this.playercombo = "-"; // プレイヤー攻撃中のコンボ数
+    this.bosscombo = "-"; // ボス攻撃中のコンボ数
+    this.time = "-"; // 演奏時間
+  }
+
+  // 表示設定関連オブジェクト
+  function Option() {
+    this.beatHeight = DEFAULT_BEAT_HEIGHT; // 拍の高さ
+    this.laneWidth = DEFAULT_LANE_WIDTH; // レーンの幅
+    this.colBeat = DEFAULT_COL_BEAT; // 列の拍数
+    this.markerSize = DEFAULT_MARKER_SIZE; // マーカーの大きさ
+    this.fontSize = DEFAULT_FONT_SIZE; // フォントの大きさ
+    this.startOffset = DEFAULT_START_OFFSET; // 演奏開始から1小節目が流れてくるまでの時間
+    this.longMarkerFastTap = DEFAULT_LONG_MARKER_FAST_TAP; // ロングマーカーの強調表示設定
+    this.stageType = "score"; // 選択中のステージタイプ
+    this.feverGaugeHigh = false; // フィーバーゲージがたまりやすくなるのスキルの使用有無
+    this.bossAttackFrequently = false; // ボスの攻撃頻度を下げるのスキルの使用有無
+    this.bossAttackShort = false; // ボスの攻撃時間が短くなるのスキルの使用有無
+    this.scoreboost = false; // スコアブーストマーカーの表示有無
+    this.scoreboostCount = 0; // スコアブーストのスキル所持ブロマイド数
+  }
+
+  // コンボ情報オブジェクト
+  function ComboInfo() {
+    this.index = 0; // 対応するマーカーオブジェクトのインデックス
+    this.longIndex = 0; // 対応するロングマーカーオブジェクトのインデックス
+    this.type = 0; // マーカーの種類
+    this.time = 0.0; // 時間(ms)
+    this.bpm = 0.0; // BPM
+    this.scroll = 0.0; // SCROLL
+    this.measure = 0; // 小節
+    this.point = 0; // 拍
+    this.judge = 0; // 判定(未使用)
+    this.skill = 0; // スキル(0:なし 1:スコアブースト)
+  }
+
+  // マーカー数とコンボ数の関連付けオブジェクト
+  function MarkerComboRelation() {
+    this.index = 0; // 対応するコンボ情報オブジェクトのインデックス
+    this.long = null; // ローングマーカーのホールド情報に対応するコンボ情報オブジェクトのインデックスを配列で格納
+  }
 
   // ローカルストレージ格納用オブジェクト
   function ScoreViewerOptionStorage(option) {
@@ -53,6 +90,7 @@ var SBRSViewer = (function() {
     this.markerSize = option.markerSize;
     this.fontSize = option.fontSize;
     this.longMarkerFastTap = option.longMarkerFastTap;
+    this.scoreboost = option.scoreboost;
   }
 
   // 対応チェック
@@ -237,6 +275,23 @@ var SBRSViewer = (function() {
       draw();
     });
 
+    // スコアブーストマーカーの表示表示変更
+    document.getElementById("scoreboost-marker").addEventListener("change", function(e) {
+      SBRSViewer.option.scoreboost = e.target.checked;
+      draw();
+      if (e.target.checked) {
+        document.getElementById("scoreboost-count-item").style.display = "inline";
+      } else {
+        document.getElementById("scoreboost-count-item").style.display = "none";
+      }
+    });
+
+    // スコアブーストのスキル所持ブロマイド数変更
+    document.getElementById("scoreboost-count").addEventListener("change", function(e) {
+      SBRSViewer.option.scoreboostCount = parseInt(e.target.value);
+      draw();
+    });
+
     // オプションの保存
     document.getElementById("option-save").addEventListener("click", function(e) {
       var storage = new ScoreViewerOptionStorage(SBRSViewer.option);
@@ -282,6 +337,7 @@ var SBRSViewer = (function() {
       SBRSViewer.option.markerSize = option.markerSize || DEFAULT_MARKER_SIZE;
       SBRSViewer.option.fontSize = option.fontSize || DEFAULT_FONT_SIZE;
       SBRSViewer.option.longMarkerFastTap = option.longMarkerFastTap || DEFAULT_LONG_MARKER_FAST_TAP;
+      SBRSViewer.option.scoreboost = option.scoreboost || DEFAULT_SCORE_BOOST_MARKER;
     } else {
       SBRSViewer.option.beatHeight = DEFAULT_BEAT_HEIGHT;
       SBRSViewer.option.laneWidth = DEFAULT_LANE_WIDTH;
@@ -289,6 +345,15 @@ var SBRSViewer = (function() {
       SBRSViewer.option.markerSize = DEFAULT_MARKER_SIZE;
       SBRSViewer.option.fontSize = DEFAULT_FONT_SIZE;
       SBRSViewer.option.longMarkerFastTap = DEFAULT_LONG_MARKER_FAST_TAP;
+      SBRSViewer.option.scoreboost = DEFAULT_SCORE_BOOST_MARKER;
+    }
+
+    SBRSViewer.option.scoreboostCount = DEFAULT_SCORE_BOOST_COUNT;
+
+    if (SBRSViewer.option.scoreboost) {
+      document.getElementById("scoreboost-count-item").style.display = "inline";
+    } else {
+      document.getElementById("scoreboost-count-item").style.display = "none";
     }
 
     document.getElementById("display-lane-width").value = SBRSViewer.option.laneWidth;
@@ -297,6 +362,7 @@ var SBRSViewer = (function() {
     document.getElementById("display-marker-size").value = SBRSViewer.option.markerSize;
     document.getElementById("display-font-size").value = SBRSViewer.option.fontSize;
     document.getElementById("long-marker-fast-tap").checked = SBRSViewer.option.longMarkerFastTap;
+    document.getElementById("scoreboost-marker").checked = SBRSViewer.option.scoreboost;
   }
 
   /* function resetForm
@@ -443,9 +509,10 @@ var SBRSViewer = (function() {
     var markerIndex;
     var colDrawBeat;
     var laneCount;
-    var markerHitInfo = [];
+    var comboInfo = [];
     var longMakrerInfo = [];
     var backgroundInfo = [];
+    var markerComboRelation = [];
     var i, iLen;
 
     viewElement = document.getElementById("view");
@@ -462,11 +529,11 @@ var SBRSViewer = (function() {
     // 描画済みマーカーのindexを初期化
     markerIndex = 0;
 
-    // マーカーの判定などを格納する配列の初期化
-    initMarkerHitInfo(markerHitInfo);
+    // コンボ毎の情報を格納する配列とマーカーとコンボ情報の関連付けを格納する配列の初期化
+    initcomboInfo(comboInfo, markerComboRelation);
 
     // フィーバーゲージ、ボス攻撃時間の情報をセット
-    setBackgroundInfo(backgroundInfo, markerHitInfo);
+    setBackgroundInfo(backgroundInfo, comboInfo);
 
     // 全小節の描画が終わるまでループ
     for (measureIndex = 0, measureIndexLength = sbrs.measureCount; measureIndex < measureIndexLength;) {
@@ -536,7 +603,7 @@ var SBRSViewer = (function() {
         drawLongLine(markerAriaDiv, measure, measureHeight, longMakrerInfo, colDrawBeat);
 
         // マーカーの描画
-        markerIndex = drawMarker(markerAriaDiv, markerIndex, measure, measureHeight, longMakrerInfo);
+        markerIndex = drawMarker(markerAriaDiv, markerIndex, measure, measureHeight, longMakrerInfo, comboInfo, markerComboRelation);
 
         measureIndex++;
 
@@ -554,66 +621,117 @@ var SBRSViewer = (function() {
     addLoadStyle();
   }
 
-  /* function initMarkerHitInfo
-   * マーカーの判定などを格納する配列を初期化します
-   * 引数1 : マーカーの判定などを格納する配列
+  /* function initcomboInfo
+   * コンボ毎の情報を格納する配列とマーカーとコンボ情報の関連付けを行う配列の初期化します
+   * 引数1 : コンボ毎の情報を格納する配列
+   * 引数2 : コンボ情報の関連付けを格納する配列
    * 戻り値 : なし
    */
-  function initMarkerHitInfo(markerHitInfo) {
+  function initcomboInfo(comboInfo, markerComboRelation) {
 
     var sbrs = SBRSViewer.sbrs;
     var markerObj;
     var longMarkerObj;
+    var comboInfoObj;
+    var comboInfoCount;
+    var skillInvokeTime;
+    var addCount;
     var i, iLen, j, jLen;
     var measure;
+
+    comboInfoCount = 0;
 
     for (i = 0, iLen = sbrs.markerCount; i < iLen; i++) {
 
       markerObj = sbrs.marker[i];
       measure = markerObj.measure;
 
-      markerHitInfo.push({
-        type: markerObj.type,
-        time: markerObj.time,
-        measure: measure,
-        point: markerObj.point,
-        judge: 0
-      });
+      comboInfoObj = new ComboInfo();
+      comboInfoObj.index = i;
+      comboInfoObj.longIndex = null;
+      comboInfoObj.type = markerObj.type;
+      comboInfoObj.time = markerObj.time;
+      comboInfoObj.bpm = markerObj.bpm;
+      comboInfoObj.scroll = markerObj.scroll;
+      comboInfoObj.measure = measure;
+      comboInfoObj.point = markerObj.point;
+      comboInfoObj.judge = 0;
+      comboInfo[comboInfoCount] = comboInfoObj;
+
+      markerComboRelation[i] = 　new MarkerComboRelation();
+
+      comboInfoCount++;
 
       if (markerObj.long) {
+
+        markerComboRelation[i].long = [];
+
         for (j = 0, jLen = markerObj.long.length; j < jLen; j++) {
 
           longMarkerObj = sbrs.marker[i].long[j];
           measure = longMarkerObj.measure;
 
-          markerHitInfo.push({
-            type: longMarkerObj.type,
-            time: longMarkerObj.time,
-            measure: measure,
-            point: longMarkerObj.point,
-            judge: 0
-          });
+          comboInfoObj = new ComboInfo();
+          comboInfoObj.index = i;
+          comboInfoObj.longIndex = j;
+          comboInfoObj.type = longMarkerObj.type;
+          comboInfoObj.time = longMarkerObj.time;
+          comboInfoObj.bpm = longMarkerObj.bpm;
+          comboInfoObj.scroll = longMarkerObj.scroll;
+          comboInfoObj.measure = measure;
+          comboInfoObj.point = longMarkerObj.point;
+          comboInfoObj.judge = 0;
+          comboInfo[comboInfoCount] = comboInfoObj;
+
+          markerComboRelation[i].long[j] = 　new MarkerComboRelation();
+
+          comboInfoCount++;
         }
       }
     }
 
     // 時間順でソート
-    markerHitInfo.sort(function(a, b) {
+    comboInfo.sort(function(a, b) {
       return a.time - b.time;
     });
+
+    // index付与
+    for (i = 0, iLen = comboInfo.length; i < iLen; i++) {
+      if (comboInfo[i].type !== 4) {
+        markerComboRelation[comboInfo[i].index].index = i;
+      } else {
+        markerComboRelation[comboInfo[i].index].long[comboInfo[i].longIndex].index = i;
+      }
+    }
+
+    // スコアブーストの情報付与
+    for (i = SCORE_BOOST_COMBO_INTERVAL, iLen = comboInfo.length; i < iLen; i += SCORE_BOOST_COMBO_INTERVAL) {
+
+      // BPM120時,1500msが基準
+      skillInvokeTime = comboInfo[i].time + 1500 * (120.0 / (comboInfo[i].bpm * comboInfo[i].scroll));
+
+      for (addCount = 0, j = i + 1, jLen = iLen; j < jLen && addCount < option.scoreboostCount; j++) {
+
+        // スキル発動時間経過後の通常マーカーにスキル「スコアブースト」の発動情報を付与
+        if (comboInfo[j].time >= skillInvokeTime && comboInfo[j].type === 1 && comboInfo[i].skill === 0) {
+          comboInfo[j].skill = 1;
+          addCount++;
+        }
+      }
+    }
   }
 
   /* function setBackgroundInfo
    * フィーバーゲージ、ボス攻撃時間の情報をセットします
    * 引数1 : フィーバーゲージ、ボス攻撃時間の情報を格納する配列
-   * 引数2 : マーカーの判定などを格納する配列
+   * 引数2 : コンボ毎の情報を格納する配列
    * 戻り値 : なし
    */
-  function setBackgroundInfo(backgroundInfo, markerHitInfo) {
+  function setBackgroundInfo(backgroundInfo, comboInfo) {
 
     var sbrs = SBRSViewer.sbrs;
     var addGaugeIncrement = 4 * (SBRSViewer.option.feverGaugeHigh ? FEVER_HIGH_MAGNIFICATION : 1);
-    var markerHitLength = markerHitInfo.length;
+    var markerHitLength = comboInfo.length;
     var normalComboCount = 0;
     var feverComboCount = 0;
     var feverEndTime = 0;
@@ -631,9 +749,9 @@ var SBRSViewer = (function() {
     // フィーバーゲージの範囲セット
     for (measureIndex = 0, measureIndexLength = sbrs.measureCount; measureIndex < measureIndexLength; measureIndex++) {
 
-      while (markerHitIndex < markerHitLength && markerHitInfo[markerHitIndex].measure === measureIndex + 1) {
+      while (markerHitIndex < markerHitLength && comboInfo[markerHitIndex].measure === measureIndex + 1) {
 
-        hitInfo = markerHitInfo[markerHitIndex];
+        hitInfo = comboInfo[markerHitIndex];
         hitTime = hitInfo.time;
         hitPoint = hitInfo.point;
 
@@ -704,13 +822,13 @@ var SBRSViewer = (function() {
       });
 
       // 通常マーカーのカウント
-      while (markerHitIndex < markerHitLength && markerHitInfo[markerHitIndex].time < fromTime) {
+      while (markerHitIndex < markerHitLength && comboInfo[markerHitIndex].time < fromTime) {
         playerComboCount++;
         markerHitIndex++;
       }
 
       // BOSSアタックマーカーのカウント
-      while (markerHitIndex < markerHitLength && markerHitInfo[markerHitIndex].time < toTime) {
+      while (markerHitIndex < markerHitLength && comboInfo[markerHitIndex].time < toTime) {
         bossComboCount++;
         markerHitIndex++;
       }
@@ -804,9 +922,11 @@ var SBRSViewer = (function() {
    * 引数3 : 現在の小節
    * 引数4 : 描画エリアの高さ
    * 引数5 : ロングマーカーの描画情報
+   * 引数6 : コンボ毎の情報を格納する配列
+   * 引数7 : コンボ情報の関連付けを格納する配列
    * 戻り値 : 次に処理するマーカーのインデックス
    */
-  function drawMarker(markerAriaDiv, markerIndex, measure, measureHeight, longMakrerInfo) {
+  function drawMarker(markerAriaDiv, markerIndex, measure, measureHeight, longMakrerInfo, comboInfo, markerComboRelation) {
 
     var sbrs = SBRSViewer.sbrs;
     var len;
@@ -815,6 +935,7 @@ var SBRSViewer = (function() {
     var markerValueDiv;
     var measureObj;
     var measureB;
+    var comboInfoIndex;
 
     if (measure <= sbrs.measureCount) {
 
@@ -832,10 +953,16 @@ var SBRSViewer = (function() {
         markerDiv.style.bottom = (marker.point * SBRSViewer.option.beatHeight * 4 / measureB - (SBRSViewer.option.markerSize - 1) / 2 - 1) + "px";
         markerDiv.style.lineHeight = (SBRSViewer.option.markerSize - 2) + "px";
 
+        comboInfoIndex = markerComboRelation[markerIndex].index;
+
         switch (marker.type) {
           case 1:
             // 通常マーカー
-            markerDiv.className = "normal-marker";
+            if (comboInfo[comboInfoIndex].skill === 1 && option.scoreboost) {
+              markerDiv.className = "normal-marker skill-scoreboost";
+            } else {
+              markerDiv.className = "normal-marker";
+            }
             markerDiv.style.zIndex = 200 + len - markerIndex;
             break;
           case 2:

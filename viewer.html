@@ -50,7 +50,7 @@
         <div class="value">-</div>
         <div class="key">FEVER-GAUGE</div>
         <div class="description">
-          <p>フィーバーゲージの長さです。 PERFECT～MISSの判定により、それぞれ4,2,1,-1と増加し、 この値以上になるとフィーバーになります。</p>
+          <p>フィーバーゲージの長さです。 PERFECT～MISSの判定により、それぞれ4,2,0,-1と増加し、 この値を超えるとフィーバーになります。</p>
           <p>「フィーバーゲージがたまりやすくなる」のスキルを使用している場合、増加量が7倍になります。</p>
         </div>
       </li>
@@ -221,6 +221,22 @@
           <div>
             <input type="checkbox" id="long-marker-fast-tap" />
             <label for="long-marker-fast-tap">早押し・遅く離すのが必要なロングマーカーを強調</label>
+          </div>
+          <div>
+            <input type="checkbox" id="scoreboost-marker" />
+            <label for="scoreboost-marker">スコアブーストマーカーを強調</label>
+            <label class="line" id="scoreboost-count-item">
+              スコアブースト数
+              <select id="scoreboost-count">
+                <option value="6" selected>6</option>
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1</option>
+                <option value="0">0</option>
+              </select>
+            </label>
           </div>
         </div>
         <div class="option-display-right">
