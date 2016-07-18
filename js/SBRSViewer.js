@@ -1,4 +1,4 @@
-// ver 1.2.0
+// ver 1.2.1
 var SBRSViewer = (function() {
 
   var SBRSViewer = {};
@@ -20,6 +20,7 @@ var SBRSViewer = (function() {
   var DEFAULT_LONG_MARKER_FAST_TAP = false; // ロングマーカーの強調表示設定のデフォルト
   var DEFAULT_SCORE_BOOST_MARKER = false; // スコアブーストマーカーの表示設定のデフォルト
   var DEFAULT_SCORE_BOOST_COUNT = 6; // スコアブーストのスキル所持ブロマイド数のデフォルト
+  var DEFAULT_SCROLL_SPEED = 1.0; // マーカーのスクロール速度のデフォルト
 
   var VIEWER_STORAGE_KEY = "VIEWER_OPTION_DATA"; // オプション保存用ローカルストレージのキー
 
@@ -60,6 +61,7 @@ var SBRSViewer = (function() {
     this.bossAttackShort = false; // ボスの攻撃時間が短くなるのスキルの使用有無
     this.scoreboost = false; // スコアブーストマーカーの表示有無
     this.scoreboostCount = 0; // スコアブーストのスキル所持ブロマイド数
+    this.scrollSpeed = 1.0; // マーカーのスクロール速度
   }
 
   // コンボ情報オブジェクト
@@ -275,7 +277,7 @@ var SBRSViewer = (function() {
       draw();
     });
 
-    // スコアブーストマーカーの表示表示変更
+    // スコアブーストマーカーの表示変更
     document.getElementById("scoreboost-marker").addEventListener("change", function(e) {
       SBRSViewer.option.scoreboost = e.target.checked;
       draw();
@@ -289,6 +291,12 @@ var SBRSViewer = (function() {
     // スコアブーストのスキル所持ブロマイド数変更
     document.getElementById("scoreboost-count").addEventListener("change", function(e) {
       SBRSViewer.option.scoreboostCount = parseInt(e.target.value);
+      draw();
+    });
+
+    // スクロール速度変更
+    document.getElementById("scroll-speed").addEventListener("change", function(e) {
+      SBRSViewer.option.scrollSpeed = parseFloat(e.target.value);
       draw();
     });
 
@@ -349,6 +357,7 @@ var SBRSViewer = (function() {
     }
 
     SBRSViewer.option.scoreboostCount = DEFAULT_SCORE_BOOST_COUNT;
+    SBRSViewer.option.scrollSpeed = DEFAULT_SCROLL_SPEED;
 
     if (SBRSViewer.option.scoreboost) {
       document.getElementById("scoreboost-count-item").style.display = "inline";
@@ -707,15 +716,18 @@ var SBRSViewer = (function() {
     // スコアブーストの情報付与
     for (i = SCORE_BOOST_COMBO_INTERVAL, iLen = comboInfo.length; i < iLen; i += SCORE_BOOST_COMBO_INTERVAL) {
 
-      // BPM120時,1500msが基準
-      skillInvokeTime = comboInfo[i].time + 1500 * (120.0 / (comboInfo[i].bpm * comboInfo[i].scroll));
+      // BPM120時,1650msが基準
+      skillInvokeTime = comboInfo[i].time + 1650 * (120.0 / (comboInfo[i].bpm * comboInfo[i].scroll * option.scrollSpeed));
 
       for (addCount = 0, j = i + 1, jLen = iLen; j < jLen && addCount < option.scoreboostCount; j++) {
 
         // スキル発動時間経過後の通常マーカーにスキル「スコアブースト」の発動情報を付与
         if (comboInfo[j].time >= skillInvokeTime && comboInfo[j].type === 1 && comboInfo[i].skill === 0) {
+
           comboInfo[j].skill = 1;
           addCount++;
+        } else {
+
         }
       }
     }

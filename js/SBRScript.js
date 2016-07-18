@@ -1,7 +1,12 @@
-// ver 1.0.0
+// ver 1.1.0
 var SBRScript = (function() {
 
   var SBRScript = {};
+
+  var DEFAULT_BPM = 120.0;
+  var DEFAULT_MEASURE_S = 4;
+  var DEFAULT_MEASURE_B = 4;
+  var DEFAULT_SCROLL = 1.0;
 
   // Sbrsオブジェクト
   function Sbrs() {
@@ -88,12 +93,12 @@ var SBRScript = (function() {
     var type, typeTmp;
     var i, iLen;
     var loop;
-    var measureS = 4.0;
-    var measureB = 4.0;
+    var measureS = DEFAULT_MEASURE_S;
+    var measureB = DEFAULT_MEASURE_B;
     var time = 0.0;
     var lastTime = 0.0;
-    var bpm = 120.0;
-    var scroll = 1.0;
+    var bpm = DEFAULT_BPM;
+    var scroll = DEFAULT_SCROLL;
     var laneCount;
     var lastLaneType = [];
     var bpmValueArray = [];
@@ -407,11 +412,11 @@ var SBRScript = (function() {
     }
 
     if (bpmIndex === -1) {
-      // 該当小節にBPM変更なし
+      // 該当小節にBPM変更あり
 
       time = measureObj.time + (240000.0 / bpm * (measureObj.valueS / measureObj.valueB) * (point / measureObj.valueS));
     } else {
-      // 該当小節にBPM変更あり
+      // 該当小節にBPM変更なし
 
       bpmObj = sbrs.bpm[bpmIndex];
       if (bpmObj.point === point) {
@@ -476,7 +481,7 @@ var SBRScript = (function() {
     }
 
     if (bpmIndex !== -1) {
-      // 該当小節にBPM変更なし
+      // 該当小節にBPM変更あり
 
       bpmObj = sbrs.bpm[bpmIndex];
 
@@ -484,7 +489,7 @@ var SBRScript = (function() {
       pointValue = bpmObj.point + measureS * ((time - bpmObj.time) / (240000.0 / bpmObj.value * (measureS / measureB)));
 
     } else {
-      // 該当小節にBPM変更あり
+      // 該当小節にBPM変更なし
 
       // 1小節の時間
       measureTime = 240000.0 / bpm * (measureS / measureB);
@@ -503,6 +508,24 @@ var SBRScript = (function() {
       measure: measureValue,
       point: pointValue
     };
+  };
+
+  /* function getTimeFromMeasurePoint
+   * 時間を元にBPMを取得します
+   * 引数1 : sbrsオブジェクト
+   * 引数2 : BPMを確認したい時間
+   * 戻り値 : BPM
+   */
+  SBRScript.getBpmFromTime = function(sbrs, time) {
+
+    var bpm = DEFAULT_BPM;
+    var i, iLen;
+
+    for (i = 0, iLen = sbrs.bpmCount; i < iLen && sbrs.bpm[i].time <= time; i++) {
+      bpm = sbrs.bpm[i].value;
+    }
+
+    return bpm;
   };
 
   /* function getLaneCount
@@ -694,6 +717,9 @@ var SBRScript = (function() {
               markerObj.time = SBRScript.getTimeFromMeasurePoint(sbrs, measure, point);
               markerObj.type = 4;
               markerObj.lane = lane;
+              markerObj.bpm = SBRScript.getBpmFromTime(markerObj.time);
+              markerObj.scroll = 1.0; // 仮
+              markerObj.pair = -1;
               marker.long.push(markerObj);
             }
           }
