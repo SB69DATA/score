@@ -1,4 +1,4 @@
-// ver 1.2.1
+// ver 1.2.2
 var SBRSViewer = (function() {
 
   var SBRSViewer = {};
@@ -1149,9 +1149,9 @@ var SBRSViewer = (function() {
 
     // BPM取得
     if (sbrs.bpmCount === 1) {
-      SBRSViewer.info.bpm = (sbrs.maxBpm * bpmMagnification);
+      SBRSViewer.info.bpm = Math.round(sbrs.maxBpm * bpmMagnification);
     } else {
-      SBRSViewer.info.bpm = (sbrs.minBpm * bpmMagnification) + " - " + (sbrs.maxBpm * bpmMagnification);
+      SBRSViewer.info.bpm = Math.roundeInt(sbrs.minBpm * bpmMagnification) + " - " + Math.round(sbrs.maxBpm * bpmMagnification);
     }
 
     // コンボ数取得
