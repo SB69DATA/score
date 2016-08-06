@@ -1,4 +1,4 @@
-// ver 1.2.2
+// ver 1.3.0
 var SBRSViewer = (function() {
 
   var SBRSViewer = {};
@@ -1014,7 +1014,7 @@ var SBRSViewer = (function() {
             break;
           case 3:
             // ロング終了
-            if (SBRSViewer.option.longMarkerFastTap && marker.point % 1 > 0 && marker.point % 1 <= 0.25) {
+            if ((SBRSViewer.option.longMarkerFastTap && marker.point % 1 > 0 && marker.point % 1 <= 0.25) || marker.longEndCountFlag) {
               markerDiv.className = "long-marker emphasis";
             } else {
               markerDiv.className = "long-marker";

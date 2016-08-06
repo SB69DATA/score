@@ -1,4 +1,4 @@
-// ver 1.1.0
+// ver 1.2.0
 var SBRScript = (function() {
 
   var SBRScript = {};
@@ -51,6 +51,7 @@ var SBRScript = (function() {
     this.bpm = 0.0; // BPM
     this.scroll = 0.0; // SCROLL
     this.pair = 0; // type2,3の場合、対になるMarkerのindexを格納
+    this.longEndCountFlag = false; // 小節線と重なるロングマーカー終端のカウントフラグ
   }
 
   // Measureオブジェクト
@@ -233,6 +234,7 @@ var SBRScript = (function() {
                 obj.bpm = bpm;
                 obj.scroll = scroll;
                 obj.pair = -1;
+                obj.longEndCountFlag = false;
                 sbrs.marker.push(obj);
 
                 type = typeTmp;
@@ -268,6 +270,11 @@ var SBRScript = (function() {
       bpmValueArray.push(obj.value);
     }
 
+    // オブジェクト数
+    sbrs.bpmCount = sbrs.bpm.length;
+    sbrs.measureCount = sbrs.measure.length;
+    sbrs.markerCount = sbrs.marker.length;
+
     // ロングマーカーの中間判定情報付与
     addLongHoldData(sbrs);
 
@@ -279,11 +286,6 @@ var SBRScript = (function() {
 
     // コンボ数の理論値
     sbrs.comboCount = getComboCount(sbrs);
-
-    // オブジェクト数
-    sbrs.bpmCount = sbrs.bpm.length;
-    sbrs.measureCount = sbrs.measure.length;
-    sbrs.markerCount = sbrs.marker.length;
 
     // マーカー数
     addMarkerCount(sbrs);
@@ -680,6 +682,7 @@ var SBRScript = (function() {
     var startPoint, endPoint;
     var measure, measureS;
     var point, pointInit, pointTarget;
+    var time, bpm, bpmTmp;
     var lane;
     var i, iLen;
 
@@ -709,18 +712,47 @@ var SBRScript = (function() {
             pointInit = (measure === startMeasure) ? Math.ceil(startPoint) : 0;
             pointTarget = (measure !== endMeasure) ? measureS : endPoint;
 
-            for (point = pointInit; point < pointTarget; point++) {
+            point = pointInit;
+            while (true) {
+
+              time = SBRScript.getTimeFromMeasurePoint(sbrs, measure, point);
+              bpm = SBRScript.getBpmFromTime(sbrs, time);
+              bpmTmp = sbrs.bpmHalfMode ? bpm / 2 : bpm;
+
+              if (point > pointTarget) {
+                // ロングマーカーの判定範囲外
+                break;
+              } else if (point === pointTarget) {
+                if (measure !== endMeasure) {
+                  // ロングマーカー終端以外
+                  break;
+                } else if (
+                  ((60000 / bpmTmp) % 25 === 0 && point % 4 === 0) ||
+                  ((60000 / bpmTmp) % 50 === 0 && point % 2 === 0) ||
+                  ((60000 / bpmTmp) % 100 === 0 && point % 1 === 0)
+                ) {
+                  // ロングマーカー終端かつbpmが特定の値以外
+                  marker.longEndCountFlag = true;
+                  endMarker.longEndCountFlag = true;
+                } else {
+                  // ロングマーカー終端かつbpmが特定の値以外
+                  break;
+                }
+              }
 
               markerObj = new Marker();
               markerObj.measure = measure;
               markerObj.point = point;
-              markerObj.time = SBRScript.getTimeFromMeasurePoint(sbrs, measure, point);
+              markerObj.time = time;
               markerObj.type = 4;
               markerObj.lane = lane;
-              markerObj.bpm = SBRScript.getBpmFromTime(markerObj.time);
+              markerObj.bpm = bpm;
               markerObj.scroll = 1.0; // 仮
               markerObj.pair = -1;
+              markerObj.longEndCountFlag = false;
               marker.long.push(markerObj);
+
+              point++;
             }
           }
         } else {
