@@ -7,13 +7,27 @@
   font-size : 100%;
 }
 
+a:link, a:visited {
+	color : #000;
+}
+
+a:hover {
+	color : #09f;
+}
+
+html {
+	text-align : center;
+}
+
 body {
   font-family : "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, sans-serif;
+	display : inline-block;
   margin : 1em;
 }
 
 h1 {
 	font-size : 30px;
+	margin : 0.5em;
 }
 
 h1 span {
@@ -23,16 +37,18 @@ h1 span {
 
 table {
 	border-spacing : 0px;
-	border-top : solid 1px  #000;
-	border-left : solid 1px  #000;
 }
 
 
 th {
-	text-align:left;
-	border-right : solid 1px  #000;
-	border-bottom : solid 1px  #000;
+	text-align:center;
 	padding : 0 10px;
+	border-bottom : solid 1px  #888;
+}
+
+tr:first-of-type th {
+
+	border-bottom : solid 4px  #666;
 }
 
 tr td:first-of-type {
@@ -45,14 +61,12 @@ tr td:not(:first-of-type) {
 
 td {
 	text-align:right;
-	border-right : solid 1px  #000;
-	border-bottom : solid 1px  #000;
+	border-bottom : solid 1px  #888;
 	padding : 0 6px;
 }
 
 .item_name {
-	background : #61ccff;
-	color : #fff;
+	color : #333;
 }
 
 .combo {
