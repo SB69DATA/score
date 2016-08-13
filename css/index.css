@@ -47,10 +47,12 @@ th {
   text-align: center;
   padding: 0 10px;
   border-bottom: solid 1px #888;
+  border-left: solid 1px #888;
 }
 
 tr:first-of-type th {
   border-bottom: solid 4px #666;
+  border-left-width: 0;
 }
 
 tr td:first-of-type {
@@ -65,6 +67,14 @@ td {
   text-align: right;
   border-bottom: solid 1px #888;
   padding: 0 6px;
+}
+
+td:last-of-type {
+  border-right: solid 1px #666;
+}
+
+td:nth-of-type(3) {
+  border-right: solid 1px #666;
 }
 
 .item_name {
