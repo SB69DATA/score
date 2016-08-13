@@ -39,11 +39,6 @@ h1 span {
   font-family: "アンニャントロマン";
 }
 
-h1 span {
-  display: inline-block;
-  position: relative;
-}
-
 table {
   border-spacing: 0px;
 }
