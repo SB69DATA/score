@@ -1,58 +1,65 @@
-@charset "utf-8"; 
-
+@charset "utf-8";
 * {
-  margin    : 0;
-  padding   : 0;
-  border    : 0;
-  font-size : 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
 }
 
-a:link, a:visited {
-	color : #000;
+a:link,
+a:visited {
+  color: #000;
 }
 
 a:hover {
-	color : #09f;
+  color: #09f;
 }
 
 html {
-	text-align : center;
+  text-align: center;
 }
 
 body {
-  font-family : "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, sans-serif;
-	display : inline-block;
-  margin : 1em;
+  font-family: "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, sans-serif;
+  display: inline-block;
+  margin: 1em;
 }
 
 h1 {
-	font-size : 30px;
-	margin : 0.5em;
+  font-size: 30px;
+  margin: 0.5em;
+}
+
+@font-face {
+  font-family: "アンニャントロマン";
+  src: local("アンニャントロマン"), url("../font/toroman.woff") format("woff"), url("../font/toroman.ttf") format("truetype");
 }
 
 h1 span {
- display:inline-block;
- position:relative;
- }
-
-table {
-	border-spacing : 0px;
+  font-family: "アンニャントロマン";
 }
 
+h1 span {
+  display: inline-block;
+  position: relative;
+}
+
+table {
+  border-spacing: 0px;
+}
 
 th {
-	text-align:center;
-	padding : 0 10px;
-	border-bottom : solid 1px  #888;
+  text-align: center;
+  padding: 0 10px;
+  border-bottom: solid 1px #888;
 }
 
 tr:first-of-type th {
-
-	border-bottom : solid 4px  #666;
+  border-bottom: solid 4px #666;
 }
 
 tr td:first-of-type {
-	text-align : left;
+  text-align: left;
 }
 
 tr td:not(:first-of-type) {
@@ -60,35 +67,35 @@ tr td:not(:first-of-type) {
 }
 
 td {
-	text-align:right;
-	border-bottom : solid 1px  #888;
-	padding : 0 6px;
+  text-align: right;
+  border-bottom: solid 1px #888;
+  padding: 0 6px;
 }
 
 .item_name {
-	color : #333;
+  color: #333;
 }
 
 .combo {
-	width : 30px;
+  width: 30px;
 }
 
 .red {
-	background : #ff9b9b;
+  background: #ff9b9b;
 }
 
 .blue {
-	background : #9de8ff;
+  background: #9de8ff;
 }
 
 .green {
-	background : #bbffaf;
+  background: #bbffaf;
 }
 
 .yellow {
-	background : #f8ff96;
+  background: #f8ff96;
 }
 
 .purple {
-	background : #e3adff;
+  background: #e3adff;
 }
