@@ -53,6 +53,7 @@ th {
 tr:first-of-type th {
   border-bottom: solid 4px #666;
   border-left-width: 0;
+  white-space: nowrap;
 }
 
 tr td:first-of-type {
