@@ -1,4 +1,4 @@
-// ver 1.2.0
+// ver 1.4.0
 var SBRScript = (function() {
   'use strict';
 
