@@ -1,4 +1,4 @@
-// ver 1.4.0
+// ver 1.4.1
 var SBRScript = (function() {
   'use strict';
 
@@ -28,6 +28,7 @@ var SBRScript = (function() {
     this.bpm = []; // BPMの情報(Bpmコンストラクタ)を配列で格納
     this.marker = []; // マーカーの情報(Markerコンストラクタ)を配列で格納
     this.measure = []; // 小節の情報(Measureコンストラクタ)を配列で格納
+    this.baseScroll = 1.0;
     this.bpmCount = 0; // BPM数
     this.measureCount = 0; // 小節数
     this.markerCount = 0; // マーカー数(ロングマーカーのホールド除く)
@@ -189,6 +190,9 @@ var SBRScript = (function() {
           } else if (line.match(/^#LEVEL:/i) !== null) {
             // 難易度を取得
             sbrs.level = parseInt(line.slice('#LEVEL:'.length));
+          } else if (line.match(/^#BASESCROLL:/i) !== null) {
+            // 基準スクロール速度を取得
+            sbrs.baseScroll = parseFloat(line.slice('#BASESCROLL:'.length));
           } else if (line.match(/^#SCROLL:/i) !== null) {
             // スクロール速度を取得
             obj = new Scroll();
@@ -463,11 +467,11 @@ var SBRScript = (function() {
     }
 
     if (bpmIndex === -1) {
-      // 該当小節にBPM変更あり
+      // 該当小節にBPM変更なし
 
       time = measureObj.time + (240000.0 / bpm * (measureObj.valueS / measureObj.valueB) * (point / measureObj.valueS));
     } else {
-      // 該当小節にBPM変更なし
+      // 該当小節にBPM変更あり
 
       bpmObj = sbrs.bpm[bpmIndex];
       if (bpmObj.point === point) {
@@ -795,7 +799,7 @@ var SBRScript = (function() {
               markerObj.type = 4;
               markerObj.lane = lane;
               markerObj.bpm = bpm;
-              markerObj.scroll = 1.0; // 仮
+              markerObj.scroll = marker.scroll;
               markerObj.pair = -1;
               markerObj.longEndCountFlag = false;
               marker.long.push(markerObj);

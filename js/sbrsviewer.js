@@ -1,11 +1,11 @@
-// ver 1.4.0
+// ver 1.4.1
 var SBRSViewer = (function() {
   'use strict';
 
   var viewer = new SBRSViewer();
 
   var PLAYER_ATTACK_TIME = 10000; // プレイヤーの攻撃時間
-  var PLAYER_LONG_ATTACK_TIME = 22000; // ボウスの攻撃頻度を下げる使用時のプレイヤーの攻撃時間
+  var PLAYER_LONG_ATTACK_TIME = 22000; // ボスの攻撃頻度を下げる使用時のプレイヤーの攻撃時間
   var BOSS_ATTACK_TIME = 8500; // ボスの攻撃時間
   var BOSS_SHORT_ATTACK_TIME = 7000; // ボスの攻撃時間が短くなる使用時のボスの攻撃時間
   var FEVER_TIME = 10000; // フィーバータイムの時間
@@ -158,9 +158,8 @@ var SBRSViewer = (function() {
             try {
 
               // スクロール速度の値変更
-              viewer.option.scrollSpeed = viewer.sbrs.scroll[0].value;
+              viewer.option.scrollSpeed = viewer.sbrs.baseScroll;
               document.getElementById('scroll-speed').value = ('' + (viewer.option.scrollSpeed + 0.001)).substring(0, 3);
-              console.log(('' + (viewer.option.scrollSpeed + 0.001)).substring(0, 3));
 
               // 譜面描画
               draw();
@@ -755,10 +754,10 @@ var SBRSViewer = (function() {
     }
 
     // スコアブーストの情報付与
-    for (i = SCORE_BOOST_COMBO_INTERVAL, iLen = comboInfo.length; i < iLen; i += SCORE_BOOST_COMBO_INTERVAL) {
+    for (i = SCORE_BOOST_COMBO_INTERVAL - 1, iLen = comboInfo.length; i < iLen; i += SCORE_BOOST_COMBO_INTERVAL) {
 
-      // BPM120時,1650msが基準
-      skillInvokeTime = comboInfo[i].time + 1650 * (120.0 / (comboInfo[i].bpm * comboInfo[i].scroll * viewer.option.scrollSpeed));
+      // BPM120時,2600msが基準
+      skillInvokeTime = comboInfo[i].time + 2600 * (120.0 / ((comboInfo[i].bpm / 2.0) * comboInfo[i].scroll * viewer.option.scrollSpeed));
 
       for (addCount = 0, j = i + 1, jLen = iLen; j < jLen && addCount < viewer.option.scoreboostCount; j++) {
 
