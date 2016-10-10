@@ -1,4 +1,4 @@
-// ver 1.4.1
+// ver 1.5.0
 var SBRScript = (function() {
   'use strict';
 
@@ -28,7 +28,7 @@ var SBRScript = (function() {
     this.bpm = []; // BPMの情報(Bpmコンストラクタ)を配列で格納
     this.marker = []; // マーカーの情報(Markerコンストラクタ)を配列で格納
     this.measure = []; // 小節の情報(Measureコンストラクタ)を配列で格納
-    this.baseScroll = 1.0;
+    this.baseScroll = 1.0; // 基準スクロール速度
     this.bpmCount = 0; // BPM数
     this.measureCount = 0; // 小節数
     this.markerCount = 0; // マーカー数(ロングマーカーのホールド除く)
@@ -63,6 +63,9 @@ var SBRScript = (function() {
     this.scroll = 0.0; // SCROLL
     this.pair = 0; // type2,3の場合、対になるMarkerのindexを格納
     this.longEndCountFlag = false; // 小節線と重なるロングマーカー終端のカウントフラグ
+    this.same = false; // 同時押しマーカーの有無
+    this.sameLeft = false; // 左側の同時押しマーカーの有無
+    this.sameRight = false; // 右側の同時押しマーカーの有無
   }
 
   /**
@@ -328,11 +331,17 @@ var SBRScript = (function() {
     sbrs.measureCount = sbrs.measure.length;
     sbrs.markerCount = sbrs.marker.length;
 
+    // sbrsオブジェクトソート
+    sortSbrs(sbrs);
+
     // ロングマーカーの中間判定情報付与
     addLongHoldData(sbrs);
 
     // フィーバーゲージの情報付与
     addFeverGaugeData(sbrs);
+
+    // 同時押し情報付与
+    addSameMarkerData(sbrs);
 
     // 終了時間
     sbrs.endTime = time;
@@ -436,6 +445,18 @@ var SBRScript = (function() {
   };
 
   /**
+   * SBRスクリプトオブジェクトのデータをソートします
+   * @param {Sbrs} sbrs SBRスクリプトオブジェクト
+   */
+  function sortSbrs(sbrs) {
+
+    // マーカーをソート
+    sbrs.marker.sort(function(a, b) {
+      return a.time - b.time;
+    });
+  }
+
+  /**
    * 小節と拍数を元に時間を取得します
    * @param {Sbrs} sbrs SBRスクリプトオブジェクト
    * @param {number} measure 時間を確認したい小節
@@ -536,7 +557,7 @@ var SBRScript = (function() {
     }
 
     if (bpmIndex !== -1) {
-      // 該当小節にBPM変更あり
+      // 該当小節にBPM変更なし
 
       bpmObj = sbrs.bpm[bpmIndex];
 
@@ -544,7 +565,7 @@ var SBRScript = (function() {
       pointValue = bpmObj.point + measureS * ((time - bpmObj.time) / (240000.0 / bpmObj.value * (measureS / measureB)));
 
     } else {
-      // 該当小節にBPM変更なし
+      // 該当小節にBPM変更あり
 
       // 1小節の時間
       measureTime = 240000.0 / bpm * (measureS / measureB);
@@ -864,6 +885,49 @@ var SBRScript = (function() {
     // Feverに必要なマーカー数
     sbrs.fever = Math.ceil(sbrs.feverGaugeLength / (4.0 * 1));
     sbrs.feverHigh = Math.ceil(sbrs.feverGaugeLength / (4.0 * 7));
+  }
+
+  /**
+   * マーカーの同時押し情報を付与します
+   * @param {Sbrs} sbrs SBRスクリプトオブジェクト
+   */
+  function addSameMarkerData(sbrs) {
+
+    var marker, tmpMarker;
+    var i, iLen, j;
+
+    for (i = 0, iLen = sbrs.marker.length; i < iLen; i++) {
+
+      marker = sbrs.marker[i];
+
+      if (marker.type !== 1) {
+        continue;
+      }
+
+      for (j = i + 1; j < iLen; j++) {
+
+        tmpMarker = sbrs.marker[j];
+
+        if (tmpMarker.type !== 1) {
+          continue;
+        }
+
+        if (tmpMarker.time === marker.time) {
+
+          marker.same = true;
+          tmpMarker.same = true;
+
+          if (tmpMarker.lane > marker.lane) {
+            marker.sameRight = true;
+            tmpMarker.sameLeft = true;
+          } else {
+            marker.sameLeft = true;
+            tmpMarker.sameRight = true;
+          }
+        }
+        break;
+      }
+    }
   }
 
   /**
